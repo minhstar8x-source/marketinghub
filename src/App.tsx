@@ -27,7 +27,7 @@ import {
 } from 'recharts';
 import { 
   Plus, Trash2, LayoutDashboard, Settings, 
-  BarChart3, Eye, Share2, LogOut, ShieldCheck, ChevronRight, ArrowUp, ArrowDown
+  BarChart3, Eye, Share2, LogOut, ShieldCheck, ArrowUp, ArrowDown
 } from 'lucide-react';
 
 // --- ĐỊNH NGHĨA KIỂU DỮ LIỆU (TYPES) ---
@@ -605,7 +605,6 @@ export default function App() {
                 )) : <div className="col-span-full py-16 text-center bg-white/40 rounded-2xl border-dashed border-2 border-purple-100 text-purple-400 text-xs">Đang chờ cập nhật biểu đồ...</div>}
               </div>
             </section>
-
           </div>
         )}
       </main>
