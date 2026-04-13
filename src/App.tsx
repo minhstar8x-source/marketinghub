@@ -1,4 +1,5 @@
-import { useState, useEffect, type FC, type FormEvent } from 'react';
+import React, { useState, useEffect } from 'react';
+import type { FC, FormEvent } from 'react';
 import { initializeApp } from 'firebase/app';
 import { 
   getAuth, 
@@ -7,9 +8,9 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signOut,
-  signInWithCustomToken,
-  type User
+  signInWithCustomToken
 } from 'firebase/auth';
+import type { User } from 'firebase/auth';
 import { 
   getFirestore, 
   collection, 
@@ -89,7 +90,7 @@ const CustomTooltip: FC<TooltipProps> = ({ active, payload, label }) => {
       <div className="bg-white/95 backdrop-blur-sm p-3 border border-purple-100 rounded-xl shadow-xl ring-1 ring-purple-500/10 text-left">
         <p className="font-serif font-bold text-purple-900 text-sm">{label}</p>
         <p className="text-purple-600 font-medium text-xs">
-          {payload[0].value.toLocaleString()}
+          {Number(payload[0].value).toLocaleString()}
         </p>
       </div>
     );
@@ -164,8 +165,8 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [initError, setInitError] = useState<string | null>(null);
 
-  const [newLink, setNewLink] = useState({ title: '', url: '' });
-  const [newChart, setNewChart] = useState({ 
+  const [newLink, setNewLink] = useState<{title: string; url: string}>({ title: '', url: '' });
+  const [newChart, setNewChart] = useState<{title: string; type: string; dataInput: string}>({ 
     title: '', 
     type: 'bar', 
     dataInput: 'Tháng 1: 450, Tháng 2: 620, Tháng 3: 580' 
@@ -266,7 +267,7 @@ export default function App() {
       await addDoc(linksRef, { 
         title: newLink.title, 
         url: newLink.url, 
-        createdAt: Date.now() 
+        createdAt: Number(Date.now()) 
       });
       setNewLink({ title: '', url: '' });
     } catch (err) { console.error(err); }
@@ -288,14 +289,14 @@ export default function App() {
         const parts = item.split(':');
         return { 
           name: parts[0]?.trim() || '?', 
-          value: parseFloat(parts[1]?.trim()) || 0 
+          value: Number(parts[1]?.trim()) || 0 
         };
       });
       await addDoc(chartsRef, { 
         title: newChart.title, 
         type: newChart.type, 
         data: formattedData, 
-        createdAt: Date.now() 
+        createdAt: Number(Date.now()) 
       });
       setNewChart({ title: '', type: 'bar', dataInput: 'Tháng 1: 100, Tháng 2: 200' });
     } catch (err) { console.error(err); }
@@ -311,7 +312,7 @@ export default function App() {
   // Màn hình hướng dẫn khi thiếu cấu hình
   if (initError === 'firebase-config' && (!user || user.isAnonymous)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-purple-50 p-6">
+      <div className="min-h-screen flex items-center justify-center bg-purple-50 p-6 text-left">
         <div className="bg-white p-8 rounded-[2rem] shadow-2xl max-w-md w-full text-center border border-purple-100 animate-in fade-in zoom-in duration-300">
           <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <ShieldCheck size={32} />
@@ -351,7 +352,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fcfaff] text-slate-900 selection:bg-purple-100 font-sans relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#fcfaff] text-slate-900 selection:bg-purple-100 font-sans relative overflow-x-hidden text-left">
       
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[-10%] right-[-10%] w-[60%] h-[60%] bg-purple-200/30 rounded-full blur-[120px]"></div>
@@ -407,7 +408,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-12">
+            <div className="grid lg:grid-cols-2 gap-12 text-left">
               <section className="space-y-6">
                 <div className="bg-white/80 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white shadow-xl shadow-purple-950/5 text-left">
                   <h3 className="text-lg font-black mb-6 flex items-center gap-3 text-purple-950"><Plus className="text-white bg-purple-600 p-1.5 rounded-lg" size={24} /> Thêm Tài liệu</h3>
