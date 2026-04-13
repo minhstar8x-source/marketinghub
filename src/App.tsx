@@ -164,8 +164,8 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [initError, setInitError] = useState<string | null>(null);
 
-  const [newLink, setNewLink] = useState({ title: '', url: '' });
-  const [newChart, setNewChart] = useState({ 
+  const [newLink, setNewLink] = useState<{title: string, url: string}>({ title: '', url: '' });
+  const [newChart, setNewChart] = useState<{title: string, type: string, dataInput: string}>({ 
     title: '', 
     type: 'bar', 
     dataInput: 'Tháng 1: 450, Tháng 2: 620, Tháng 3: 580' 
@@ -283,12 +283,12 @@ export default function App() {
     if (!isAdmin || !newLink.title || !newLink.url) return;
     try {
       const linksRef = collection(db, 'artifacts', APP_IDENTIFIER, 'public', 'data', 'links');
-      const payload = { 
+      const payload: any = { 
         title: String(newLink.title), 
         url: String(newLink.url), 
         createdAt: Number(Date.now()) 
       };
-      await addDoc(linksRef, payload as any);
+      await addDoc(linksRef, payload);
       setNewLink({ title: '', url: '' });
     } catch (err) { console.error(err); }
   };
@@ -312,13 +312,13 @@ export default function App() {
           value: Number(parts[1]?.trim() || 0)
         };
       });
-      const payload = { 
+      const payload: any = { 
         title: String(newChart.title), 
         type: String(newChart.type), 
         data: formattedData, 
         createdAt: Number(Date.now()) 
       };
-      await addDoc(chartsRef, payload as any);
+      await addDoc(chartsRef, payload);
       setNewChart({ title: '', type: 'bar', dataInput: 'Tháng 1: 100, Tháng 2: 200' });
     } catch (err) { console.error(err); }
   };
