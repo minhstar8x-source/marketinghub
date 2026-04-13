@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import type { FC, FormEvent } from 'react';
 import { initializeApp } from 'firebase/app';
 import { 
@@ -27,7 +27,7 @@ import {
 } from 'recharts';
 import { 
   Plus, Trash2, LayoutDashboard, Settings, 
-  BarChart3, Eye, Share2, LogOut, ShieldCheck, ChevronRight, Settings2
+  BarChart3, Eye, Share2, LogOut, ShieldCheck, ChevronRight, Settings2, Info
 } from 'lucide-react';
 
 // --- ĐỊNH NGHĨA KIỂU DỮ LIỆU (TYPES) ---
@@ -221,12 +221,12 @@ export default function App() {
     const chartsRef = collection(db, 'artifacts', APP_IDENTIFIER, 'public', 'data', 'charts');
 
     const unsubLinks = onSnapshot(query(linksRef), (snapshot) => {
-      const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as LinkItem));
+      const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as any)) as LinkItem[];
       setLinks(data);
     }, (err) => console.error("Lỗi đồng bộ links:", err));
 
     const unsubCharts = onSnapshot(query(chartsRef), (snapshot) => {
-      const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as ChartItem));
+      const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as any)) as ChartItem[];
       setCharts(data);
     }, (err) => console.error("Lỗi đồng bộ charts:", err));
 
@@ -267,7 +267,7 @@ export default function App() {
       await addDoc(linksRef, { 
         title: newLink.title, 
         url: newLink.url, 
-        createdAt: Number(Date.now()) 
+        createdAt: Date.now() 
       });
       setNewLink({ title: '', url: '' });
     } catch (err) { console.error(err); }
@@ -296,7 +296,7 @@ export default function App() {
         title: newChart.title, 
         type: newChart.type, 
         data: formattedData, 
-        createdAt: Number(Date.now()) 
+        createdAt: Date.now() 
       });
       setNewChart({ title: '', type: 'bar', dataInput: 'Tháng 1: 100, Tháng 2: 200' });
     } catch (err) { console.error(err); }
@@ -397,11 +397,11 @@ export default function App() {
         </div>
       )}
 
-      <main className="max-w-6xl mx-auto p-6 md:p-10 relative z-10">
+      <main className="max-w-6xl mx-auto p-6 md:p-10 relative z-10 text-left">
         {view === 'admin' && isAdmin ? (
           <div className="space-y-12 animate-in fade-in slide-in-from-top-4 duration-700">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-purple-100 pb-8">
-              <div className="max-w-2xl">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-purple-100 pb-8 text-left">
+              <div className="max-w-2xl text-left">
                 <div className="flex items-center space-x-2 text-purple-600 mb-2 font-bold bg-purple-100/50 px-3 py-1 w-fit rounded-full text-[10px] tracking-widest uppercase"><ShieldCheck size={14} /><span>Admin: {user?.email}</span></div>
                 <h2 className="text-3xl font-black text-slate-900 mb-1 leading-tight tracking-tight text-left">Marketing Studio</h2>
                 <p className="text-slate-400 font-medium text-sm leading-relaxed text-left">Quản lý kho tài nguyên và biểu đồ báo cáo cho toàn bộ team.</p>
@@ -409,7 +409,7 @@ export default function App() {
             </div>
 
             <div className="grid lg:grid-cols-2 gap-12 text-left">
-              <section className="space-y-6">
+              <section className="space-y-6 text-left">
                 <div className="bg-white/80 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white shadow-xl shadow-purple-950/5 text-left">
                   <h3 className="text-lg font-black mb-6 flex items-center gap-3 text-purple-950"><Plus className="text-white bg-purple-600 p-1.5 rounded-lg" size={24} /> Thêm Tài liệu</h3>
                   <form onSubmit={handleAddLink} className="space-y-4">
@@ -426,7 +426,7 @@ export default function App() {
                 </div>
                 <div className="grid gap-3">
                   {links.map(link => (
-                    <div key={link.id} className="flex items-center justify-between p-4 bg-white/60 rounded-2xl border border-purple-50 hover:border-purple-200 transition-all group">
+                    <div key={link.id} className="flex items-center justify-between p-4 bg-white/60 rounded-2xl border border-purple-50 hover:border-purple-200 transition-all group text-left">
                       <span className="font-bold text-purple-900 text-sm truncate pl-2">{link.title}</span>
                       <button onClick={() => handleDeleteLink(link.id)} className="p-2 text-purple-200 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
                     </div>
@@ -434,7 +434,7 @@ export default function App() {
                 </div>
               </section>
 
-              <section className="space-y-6">
+              <section className="space-y-6 text-left">
                 <div className="bg-white/80 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white shadow-xl shadow-purple-950/5 text-left">
                   <h3 className="text-lg font-black mb-6 flex items-center gap-3 text-purple-950"><BarChart3 className="text-white bg-purple-600 p-1.5 rounded-lg" size={24} /> Thêm Báo cáo</h3>
                   <form onSubmit={handleAddChart} className="space-y-4">
@@ -461,7 +461,7 @@ export default function App() {
                 </div>
                 <div className="grid gap-3">
                    {charts.map(chart => (
-                    <div key={chart.id} className="flex items-center justify-between p-4 bg-white/60 rounded-2xl border border-purple-50 group">
+                    <div key={chart.id} className="flex items-center justify-between p-4 bg-white/60 rounded-2xl border border-purple-50 group text-left">
                       <span className="font-bold text-purple-950 text-xs italic pl-2">{chart.title}</span>
                       <button onClick={() => handleDeleteChart(chart.id)} className="p-2 text-purple-200 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
                     </div>
@@ -480,8 +480,8 @@ export default function App() {
               <p className="text-purple-400 font-bold uppercase tracking-[0.4em] text-[10px] max-w-lg mx-auto tracking-widest">Trung tâm dữ liệu trực tuyến của Team Thắng Lợi</p>
             </header>
             
-            <section className="mb-28">
-              <div className="flex flex-col items-center mb-16">
+            <section className="mb-28 text-left">
+              <div className="flex flex-col items-center mb-16 text-center">
                 <h3 className="text-[10px] font-bold text-purple-950/30 uppercase tracking-[0.5em] mb-4">Resources</h3>
                 <div className="h-px w-24 bg-gradient-to-r from-transparent via-purple-200 to-transparent"></div>
               </div>
@@ -497,18 +497,18 @@ export default function App() {
               </div>
             </section>
 
-            <section className="pb-32">
-              <div className="flex flex-col items-center mb-20">
+            <section className="pb-32 text-left">
+              <div className="flex flex-col items-center mb-20 text-center">
                 <h3 className="text-[10px] font-bold text-purple-950/30 uppercase tracking-[0.5em] mb-4">Live Analytics</h3>
                 <div className="h-px w-24 bg-gradient-to-r from-transparent via-purple-200 to-transparent"></div>
               </div>
               <div className="grid lg:grid-cols-2 gap-16">
                 {charts.length > 0 ? charts.map(chart => (
                   <div key={chart.id} className="bg-white/80 backdrop-blur-xl p-16 rounded-[4.5rem] border-none group transition-all duration-700 hover:shadow-purple-500/10 text-left">
-                    <div className="flex items-end justify-between mb-12">
-                      <div>
+                    <div className="flex items-end justify-between mb-12 text-left">
+                      <div className="text-left">
                         <span className="text-[9px] font-bold text-purple-300 uppercase tracking-widest block mb-1.5">Visualization</span>
-                        <h4 className="font-black text-3xl text-purple-950 tracking-tight italic font-serif leading-tight">{chart.title}</h4>
+                        <h4 className="font-black text-3xl text-purple-950 tracking-tight italic font-serif leading-tight text-left">{chart.title}</h4>
                       </div>
                       <div className="text-[8px] font-black uppercase text-purple-400 bg-purple-100 px-4 py-1.5 rounded-full">{chart.type}</div>
                     </div>
@@ -521,8 +521,8 @@ export default function App() {
             </section>
 
             <div className="max-w-xl mx-auto p-12 border-t border-purple-100/50 mt-12 bg-white/20 rounded-[3rem] text-left">
-               <div className="flex items-center justify-center gap-2 mb-6 text-purple-950 font-black tracking-[0.3em] text-[10px] uppercase"><Settings2 size={16} /> Hướng dẫn Vercel & Firebase</div>
-               <div className="space-y-4 text-[11px] text-slate-500 italic leading-loose px-4">
+               <div className="flex items-center justify-center gap-2 mb-6 text-purple-950 font-black tracking-[0.3em] text-[10px] uppercase text-center"><Info size={16} /> Hướng dẫn Vercel & Firebase</div>
+               <div className="space-y-4 text-[11px] text-slate-500 italic leading-loose px-4 text-left">
                   <p className="flex items-start gap-3"><ChevronRight size={14} className="text-purple-400 shrink-0 mt-1" /> <span><b>Bật Anonymous Sign-in:</b> Truy cập Firebase Console {'\u2192'} Authentication {'\u2192'} Sign-in method {'\u2192'} Bật <b>Anonymous</b>.</span></p>
                   <p className="flex items-start gap-3"><ChevronRight size={14} className="text-purple-400 shrink-0 mt-1" /> <span><b>Cấu hình Authorized Domains:</b> Sau khi deploy lên Vercel, hãy thêm domain Vercel của bạn vào danh sách Authorized Domains trong cài đặt Authentication của Firebase để Gmail Login hoạt động chính xác.</span></p>
                </div>
@@ -531,9 +531,9 @@ export default function App() {
         )}
       </main>
 
-      <footer className="max-w-6xl mx-auto p-20 border-t border-purple-50 text-center relative z-10 opacity-30">
-        <h1 className="text-[10px] font-black text-purple-950 tracking-[0.6em] uppercase mb-4">Marketing Hub v2.5</h1>
-        <p className="text-slate-400 text-[8px] font-bold tracking-[0.3em] uppercase italic italic">Powered by Thắng Lợi Group Cloud Services</p>
+      <footer className="max-w-6xl mx-auto p-20 border-t border-purple-50 text-center relative z-10 opacity-30 text-center">
+        <h1 className="text-[10px] font-black text-purple-950 tracking-[0.6em] uppercase mb-4 text-center">Marketing Hub v2.5</h1>
+        <p className="text-slate-400 text-[8px] font-bold tracking-[0.3em] uppercase italic italic text-center text-center text-center">Powered by Thắng Lợi Group Cloud Services</p>
       </footer>
     </div>
   );
