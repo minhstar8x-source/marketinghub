@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import type { FC, FormEvent } from 'react';
+import { useState, useEffect, type FC, type FormEvent } from 'react';
 import { initializeApp } from 'firebase/app';
 import { 
   getAuth, 
@@ -8,9 +7,9 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signOut,
-  signInWithCustomToken
+  signInWithCustomToken,
+  type User
 } from 'firebase/auth';
-import type { User } from 'firebase/auth';
 import { 
   getFirestore, 
   collection, 
@@ -27,7 +26,7 @@ import {
 } from 'recharts';
 import { 
   Plus, Trash2, LayoutDashboard, Settings, 
-  BarChart3, Eye, Share2, LogOut, ShieldCheck, ChevronRight, Info
+  BarChart3, Eye, Share2, LogOut, ShieldCheck, ChevronRight
 } from 'lucide-react';
 
 // --- ĐỊNH NGHĨA KIỂU DỮ LIỆU (TYPES) ---
@@ -165,8 +164,8 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [initError, setInitError] = useState<string | null>(null);
 
-  const [newLink, setNewLink] = useState<{title: string; url: string}>({ title: '', url: '' });
-  const [newChart, setNewChart] = useState<{title: string; type: string; dataInput: string}>({ 
+  const [newLink, setNewLink] = useState({ title: '', url: '' });
+  const [newChart, setNewChart] = useState({ 
     title: '', 
     type: 'bar', 
     dataInput: 'Tháng 1: 450, Tháng 2: 620, Tháng 3: 580' 
@@ -240,7 +239,10 @@ export default function App() {
           id: d.id,
           title: String(docData.title || ''),
           type: String(docData.type || 'bar'),
-          data: docData.data || [],
+          data: (docData.data || []).map((item: any) => ({
+            name: String(item.name || ''),
+            value: Number(item.value || 0)
+          })),
           createdAt: Number(docData.createdAt || 0)
         } as ChartItem;
       });
@@ -281,12 +283,12 @@ export default function App() {
     if (!isAdmin || !newLink.title || !newLink.url) return;
     try {
       const linksRef = collection(db, 'artifacts', APP_IDENTIFIER, 'public', 'data', 'links');
-      const payload: any = { 
+      const payload = { 
         title: String(newLink.title), 
         url: String(newLink.url), 
         createdAt: Number(Date.now()) 
       };
-      await addDoc(linksRef, payload);
+      await addDoc(linksRef, payload as any);
       setNewLink({ title: '', url: '' });
     } catch (err) { console.error(err); }
   };
@@ -306,17 +308,17 @@ export default function App() {
       const formattedData: ChartDataItem[] = newChart.dataInput.split(',').map(item => {
         const parts = item.split(':');
         return { 
-          name: parts[0]?.trim() || '?', 
-          value: Number(parts[1]?.trim()) || 0 
+          name: String(parts[0]?.trim() || '?'), 
+          value: Number(parts[1]?.trim() || 0)
         };
       });
-      const payload: any = { 
+      const payload = { 
         title: String(newChart.title), 
         type: String(newChart.type), 
         data: formattedData, 
         createdAt: Number(Date.now()) 
       };
-      await addDoc(chartsRef, payload);
+      await addDoc(chartsRef, payload as any);
       setNewChart({ title: '', type: 'bar', dataInput: 'Tháng 1: 100, Tháng 2: 200' });
     } catch (err) { console.error(err); }
   };
@@ -539,7 +541,7 @@ export default function App() {
             </section>
 
             <div className="max-w-xl mx-auto p-12 border-t border-purple-100/50 mt-12 bg-white/20 rounded-[3rem] text-left">
-               <div className="flex items-center justify-center gap-2 mb-6 text-purple-950 font-black tracking-[0.3em] text-[10px] uppercase text-center"><Info size={16} /> Hướng dẫn Vercel & Firebase</div>
+               <div className="flex items-center justify-center gap-2 mb-6 text-purple-950 font-black tracking-[0.3em] text-[10px] uppercase text-center"><ChevronRight size={16} /> Hướng dẫn Vercel & Firebase</div>
                <div className="space-y-4 text-[11px] text-slate-500 italic leading-loose px-4 text-left">
                   <p className="flex items-start gap-3"><ChevronRight size={14} className="text-purple-400 shrink-0 mt-1" /> <span><b>Bật Anonymous Sign-in:</b> Truy cập Firebase Console {'\u2192'} Authentication {'\u2192'} Sign-in method {'\u2192'} Bật <b>Anonymous</b>.</span></p>
                   <p className="flex items-start gap-3"><ChevronRight size={14} className="text-purple-400 shrink-0 mt-1" /> <span><b>Cấu hình Authorized Domains:</b> Sau khi deploy lên Vercel, hãy thêm domain Vercel của bạn vào danh sách Authorized Domains trong cài đặt Authentication của Firebase để Gmail Login hoạt động chính xác.</span></p>
