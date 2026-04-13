@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, type FC, type FormEvent } from 'react';
 import { initializeApp } from 'firebase/app';
 import { 
   getAuth, 
@@ -8,7 +8,7 @@ import {
   signInWithPopup,
   signOut,
   signInWithCustomToken,
-  User
+  type User
 } from 'firebase/auth';
 import { 
   getFirestore, 
@@ -17,8 +17,7 @@ import {
   onSnapshot, 
   doc, 
   deleteDoc,
-  query,
-  DocumentData
+  query
 } from 'firebase/firestore';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
@@ -27,7 +26,7 @@ import {
 } from 'recharts';
 import { 
   Plus, Trash2, LayoutDashboard, Settings, 
-  BarChart3, Eye, Share2, LogOut, ShieldCheck, Info, ChevronRight, Settings2
+  BarChart3, Eye, Share2, LogOut, ShieldCheck, ChevronRight, Settings2
 } from 'lucide-react';
 
 // --- ĐỊNH NGHĨA KIỂU DỮ LIỆU (TYPES) ---
@@ -84,7 +83,7 @@ const APP_IDENTIFIER = 'marketing-hub-v2-production';
 
 // --- CÁC THÀNH PHẦN HỖ TRỢ ---
 
-const CustomTooltip: React.FC<TooltipProps> = ({ active, payload, label }) => {
+const CustomTooltip: FC<TooltipProps> = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white/95 backdrop-blur-sm p-3 border border-purple-100 rounded-xl shadow-xl ring-1 ring-purple-500/10 text-left">
@@ -98,7 +97,7 @@ const CustomTooltip: React.FC<TooltipProps> = ({ active, payload, label }) => {
   return null;
 };
 
-const RenderChart: React.FC<{ chart: ChartItem }> = ({ chart }) => {
+const RenderChart: FC<{ chart: ChartItem }> = ({ chart }) => {
   const commonProps = { data: chart.data, margin: { top: 20, right: 20, left: 0, bottom: 0 } };
   if (!chart || !chart.data) return null;
 
@@ -138,7 +137,7 @@ const RenderChart: React.FC<{ chart: ChartItem }> = ({ chart }) => {
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie data={chart.data} innerRadius={60} outerRadius={85} paddingAngle={10} dataKey="value">
-              {chart.data.map((_entry: any, i: number) => (
+              {chart.data.map((_entry, i) => (
                 <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
               ))}
             </Pie>
@@ -256,15 +255,19 @@ export default function App() {
   const handleLogout = async () => {
     await signOut(auth);
     setView('public');
-    try { await signInAnonymously(auth); } catch (e) {}
+    try { await signInAnonymously(auth); } catch (e) { console.error(e); }
   };
 
-  const handleAddLink = async (e: React.FormEvent) => {
+  const handleAddLink = async (e: FormEvent) => {
     e.preventDefault();
     if (!isAdmin || !newLink.title || !newLink.url) return;
     try {
       const linksRef = collection(db, 'artifacts', APP_IDENTIFIER, 'public', 'data', 'links');
-      await addDoc(linksRef, { ...newLink, createdAt: Date.now() });
+      await addDoc(linksRef, { 
+        title: newLink.title, 
+        url: newLink.url, 
+        createdAt: Date.now() 
+      });
       setNewLink({ title: '', url: '' });
     } catch (err) { console.error(err); }
   };
@@ -276,14 +279,17 @@ export default function App() {
     } catch (err) { console.error(err); }
   };
 
-  const handleAddChart = async (e: React.FormEvent) => {
+  const handleAddChart = async (e: FormEvent) => {
     e.preventDefault();
     if (!isAdmin || !newChart.title || !newChart.dataInput) return;
     try {
       const chartsRef = collection(db, 'artifacts', APP_IDENTIFIER, 'public', 'data', 'charts');
       const formattedData: ChartDataItem[] = newChart.dataInput.split(',').map(item => {
         const parts = item.split(':');
-        return { name: parts[0]?.trim() || '?', value: parseFloat(parts[1]?.trim()) || 0 };
+        return { 
+          name: parts[0]?.trim() || '?', 
+          value: parseFloat(parts[1]?.trim()) || 0 
+        };
       });
       await addDoc(chartsRef, { 
         title: newChart.title, 
@@ -347,7 +353,6 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#fcfaff] text-slate-900 selection:bg-purple-100 font-sans relative overflow-x-hidden">
       
-      {/* Trang trí nền */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[-10%] right-[-10%] w-[60%] h-[60%] bg-purple-200/30 rounded-full blur-[120px]"></div>
         <div className="absolute bottom-[-10%] left-[-10%] w-[60%] h-[60%] bg-indigo-100/30 rounded-full blur-[120px]"></div>
