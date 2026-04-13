@@ -281,11 +281,12 @@ export default function App() {
     if (!isAdmin || !newLink.title || !newLink.url) return;
     try {
       const linksRef = collection(db, 'artifacts', APP_IDENTIFIER, 'public', 'data', 'links');
-      await addDoc(linksRef, { 
-        title: newLink.title, 
-        url: newLink.url, 
+      const payload: any = { 
+        title: String(newLink.title), 
+        url: String(newLink.url), 
         createdAt: Number(Date.now()) 
-      });
+      };
+      await addDoc(linksRef, payload);
       setNewLink({ title: '', url: '' });
     } catch (err) { console.error(err); }
   };
@@ -309,12 +310,13 @@ export default function App() {
           value: Number(parts[1]?.trim()) || 0 
         };
       });
-      await addDoc(chartsRef, { 
-        title: newChart.title, 
-        type: newChart.type, 
+      const payload: any = { 
+        title: String(newChart.title), 
+        type: String(newChart.type), 
         data: formattedData, 
         createdAt: Number(Date.now()) 
-      });
+      };
+      await addDoc(chartsRef, payload);
       setNewChart({ title: '', type: 'bar', dataInput: 'Tháng 1: 100, Tháng 2: 200' });
     } catch (err) { console.error(err); }
   };
@@ -396,7 +398,7 @@ export default function App() {
 
       {showAuthModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-purple-950/40 backdrop-blur-md">
-          <div className="bg-white/90 backdrop-blur-2xl w-full max-w-sm p-10 rounded-[2.5rem] relative shadow-2xl border border-white/50 text-center animate-in zoom-in fade-in duration-300">
+          <div className="bg-white/90 backdrop-blur-2xl w-full max-sm p-10 rounded-[2.5rem] relative shadow-2xl border border-white/50 text-center animate-in zoom-in fade-in duration-300">
             <button onClick={() => setShowAuthModal(false)} className="absolute top-6 right-6 text-purple-300 hover:text-purple-950">✕</button>
             <div className="mb-8 text-center">
               <div className="w-16 h-16 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner"><ShieldCheck size={32} /></div>
