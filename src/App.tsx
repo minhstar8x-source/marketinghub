@@ -563,7 +563,7 @@ export default function App() {
                 Cloud <span className="text-purple-500 opacity-40 not-italic">Marketing</span> Hub
               </h2>
               <div className="h-0.5 w-12 md:w-16 bg-purple-950 mx-auto mb-5 md:mb-6"></div>
-              <p className="text-purple-400 font-bold uppercase tracking-[0.2em] md:tracking-[0.3em] text-[9px] md:text-[10px] max-w-lg mx-auto">Trung tâm dữ liệu trực tuyến của Team Thắng Lợi</p>
+              <p className="text-purple-400 font-bold uppercase tracking-[0.2em] md:tracking-[0.3em] text-[9px] md:text-[10px] max-w-lg mx-auto">Trung tâm dữ liệu của Team Marketing</p>
             </header>
             
             {/* Phân vùng: Resources (Thu gọn lại) */}
