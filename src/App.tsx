@@ -474,7 +474,7 @@ export default function App() {
                     </div>
                     <div>
                       <label className="block text-[10px] font-bold text-purple-300 uppercase tracking-widest mb-1.5 ml-1">Dữ liệu (Tên: Số, VD: Ads: 100, SEO: 120)</label>
-                      <textarea rows="2" className="w-full px-5 py-3.5 bg-white border border-purple-50 rounded-2xl text-sm font-medium outline-none focus:ring-4 focus:ring-purple-100 transition-all resize-none" value={newChart.dataInput} onChange={e => setNewChart({...newChart, dataInput: e.target.value})} required />
+                      <textarea rows={2} className="w-full px-5 py-3.5 bg-white border border-purple-50 rounded-2xl text-sm font-medium outline-none focus:ring-4 focus:ring-purple-100 transition-all resize-none" value={newChart.dataInput} onChange={e => setNewChart({...newChart, dataInput: e.target.value})} required />
                     </div>
                     <button type="submit" className="w-full py-4 bg-purple-100 text-purple-950 rounded-2xl font-bold text-xs uppercase tracking-[0.3em] mt-4 border border-purple-200 hover:bg-white transition-colors">Lưu Báo cáo</button>
                   </form>
