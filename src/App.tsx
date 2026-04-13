@@ -27,7 +27,7 @@ import {
 } from 'recharts';
 import { 
   Plus, Trash2, LayoutDashboard, Settings, 
-  BarChart3, Eye, Share2, LogOut, ShieldCheck, ChevronRight, Settings2, Info
+  BarChart3, Eye, Share2, LogOut, ShieldCheck, ChevronRight, Info
 } from 'lucide-react';
 
 // --- ĐỊNH NGHĨA KIỂU DỮ LIỆU (TYPES) ---
@@ -138,7 +138,7 @@ const RenderChart: FC<{ chart: ChartItem }> = ({ chart }) => {
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie data={chart.data} innerRadius={60} outerRadius={85} paddingAngle={10} dataKey="value">
-              {chart.data.map((_entry, i) => (
+              {chart.data.map((_entry: ChartDataItem, i: number) => (
                 <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
               ))}
             </Pie>
@@ -221,12 +221,29 @@ export default function App() {
     const chartsRef = collection(db, 'artifacts', APP_IDENTIFIER, 'public', 'data', 'charts');
 
     const unsubLinks = onSnapshot(query(linksRef), (snapshot) => {
-      const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as any)) as LinkItem[];
+      const data = snapshot.docs.map(d => {
+        const docData = d.data();
+        return {
+          id: d.id,
+          title: String(docData.title || ''),
+          url: String(docData.url || ''),
+          createdAt: Number(docData.createdAt || 0)
+        } as LinkItem;
+      });
       setLinks(data);
     }, (err) => console.error("Lỗi đồng bộ links:", err));
 
     const unsubCharts = onSnapshot(query(chartsRef), (snapshot) => {
-      const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as any)) as ChartItem[];
+      const data = snapshot.docs.map(d => {
+        const docData = d.data();
+        return {
+          id: d.id,
+          title: String(docData.title || ''),
+          type: String(docData.type || 'bar'),
+          data: docData.data || [],
+          createdAt: Number(docData.createdAt || 0)
+        } as ChartItem;
+      });
       setCharts(data);
     }, (err) => console.error("Lỗi đồng bộ charts:", err));
 
@@ -267,7 +284,7 @@ export default function App() {
       await addDoc(linksRef, { 
         title: newLink.title, 
         url: newLink.url, 
-        createdAt: Date.now() 
+        createdAt: Number(Date.now()) 
       });
       setNewLink({ title: '', url: '' });
     } catch (err) { console.error(err); }
@@ -296,7 +313,7 @@ export default function App() {
         title: newChart.title, 
         type: newChart.type, 
         data: formattedData, 
-        createdAt: Date.now() 
+        createdAt: Number(Date.now()) 
       });
       setNewChart({ title: '', type: 'bar', dataInput: 'Tháng 1: 100, Tháng 2: 200' });
     } catch (err) { console.error(err); }
@@ -336,7 +353,6 @@ export default function App() {
               Tôi đã bật, tải lại trang
             </button>
           </div>
-          {authError && <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-[10px] font-bold">{authError}</div>}
         </div>
       </div>
     );
