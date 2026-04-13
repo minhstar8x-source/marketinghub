@@ -606,14 +606,7 @@ export default function App() {
               </div>
             </section>
 
-            {/* Hộp hướng dẫn */}
-            <div className="max-w-xl mx-auto p-5 md:p-6 border border-purple-100/60 mt-4 bg-white/50 rounded-2xl text-left shadow-sm">
-               <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-3 text-purple-900 font-bold text-[10px] uppercase tracking-wide"><ShieldCheck size={14} className="text-purple-500" /> Hướng dẫn triển khai</div>
-               <div className="space-y-2 text-[11px] text-slate-600 leading-relaxed">
-                  <p className="flex items-start gap-2"><ChevronRight size={12} className="text-purple-400 shrink-0 mt-0.5" /> <span><b>Cấp quyền truy cập chung:</b> Vào Firebase Console {'\u2192'} Authentication {'\u2192'} Sign-in method {'\u2192'} Bật <b>Anonymous</b>.</span></p>
-                  <p className="flex items-start gap-2"><ChevronRight size={12} className="text-purple-400 shrink-0 mt-0.5" /> <span><b>Cho phép đăng nhập Admin:</b> Thêm domain Vercel của bạn vào danh sách <b>Authorized Domains</b> trong Firebase Authentication.</span></p>
-               </div>
-            </div>
+
           </div>
         )}
       </main>
